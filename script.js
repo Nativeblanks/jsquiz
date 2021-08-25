@@ -83,6 +83,7 @@ function setStatusClass(element, correct) {
   clearStatusClass(element)
   if (correct) {
     element.classList.add('correct')
+    interval++
   } else {
     element.classList.add('wrong')
   }

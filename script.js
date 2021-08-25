@@ -10,46 +10,48 @@ const answerButtonsElement = document.getElementById('answer-buttons');
 let shuffledQuestions, currentQuestionIndex
 
 //  set timer
-var count = 20;
+var count = 90;
 var interval = setInterval(function(){
   document.getElementById('timer').innerHTML=count;
   count--;
-  if (count === 0){
+  if (count < 1 ){
     clearInterval(interval);
-    resetState()
+    resetState();
     document.getElementById('timer').innerHTML='Out of Time';
-  }
+  } 
 }, 1000);
 
 //  Start button action
 startButton.addEventListener('click', startGame)
+// next button
 nextButton.addEventListener('click', () => {
   currentQuestionIndex++
   setNextQuestion()
   countdown()
 })
+
 // start game function
 function startGame() {
-  startButton.classList.add('hide')
-  shuffledQuestions = questions.sort(() => Math.random() - .5)
-  currentQuestionIndex = 0
-  questionContainerElement.classList.remove('hide')
-  setNextQuestion()
+  startButton.classList.add('hide');
+  shuffledQuestions = questions.sort(() => Math.random() - .5);
+  currentQuestionIndex = 0;
+  questionContainerElement.classList.remove('hide');
+  setNextQuestion();
 }
 // showing and randomizing the question order
 function setNextQuestion() {
-  resetState()
-  showQuestion(shuffledQuestions[currentQuestionIndex])
+  resetState();
+  showQuestion(shuffledQuestions[currentQuestionIndex]);
 }
 
 function showQuestion(question) {
-  questionElement.innerText = question.question
+  questionElement.innerText = question.question;
   question.answers.forEach(answer => {
-    const button = document.createElement('button')
-    button.innerText = answer.text
-    button.classList.add('btn')
+    const button = document.createElement('button');
+    button.innerText = answer.text;
+    button.classList.add('btn');
     if (answer.correct) {
-      button.dataset.correct = answer.correct
+      button.dataset.correct = answer.correct;
     }
     button.addEventListener('click', selectAnswer)
     answerButtonsElement.appendChild(button)
@@ -83,9 +85,12 @@ function setStatusClass(element, correct) {
   clearStatusClass(element)
   if (correct) {
     element.classList.add('correct')
-    interval++
   } else {
     element.classList.add('wrong')
+    count -= 5 
+    if (count < 0) {
+        count = 0
+    }
   }
 }
 
@@ -93,6 +98,8 @@ function clearStatusClass(element) {
   element.classList.remove('correct')
   element.classList.remove('wrong')
 }
+
+
 
 //  questions and answers available
 const questions = [

@@ -5,6 +5,16 @@ const nextButton = document.getElementById('next-btn');
 const questionContainerElement = document.getElementById('question-container');
 const questionElement = document.getElementById('question');
 const answerButtonsElement = document.getElementById('answer-buttons');
+const submitButton = document.getElementById("submit-btn")
+const topScores = document.getElementById("high-score-container");
+const playerScore = document.getElementById("playerHighScore");
+const userInput = document.getElementById("userInput")
+const scoreText = document.getElementById("scoreText")
+const highScoreList = document.getElementById("high-scores")
+var score = 0;
+localStorage.setItem("playerscores", "")
+const scoreList = []
+var playerScoreList = JSON.parse(localStorage.getItem("playerScores"))
 
 // variables 
 let shuffledQuestions, currentQuestionIndex
@@ -30,6 +40,40 @@ nextButton.addEventListener('click', () => {
   countdown()
 })
 
+submitButton.addEventListener('click', submitScore);
+
+function submitScore() {
+  console.log(userInput.value);
+  if(userInput.value.length > 3 || userInput.value.length < 3) {
+    alert("It can only be 3 letters");
+  } else {
+    var initials = userInput.value.toUpperCase();
+    var playerData = {"initials": initials, "finalScore": score + count}
+     scoreList.push(playerData);
+     console.log(scoreList);
+     submitButton.classList.add('hide')
+     userInput.classList.add('hide')
+     playerScore.classList.add('hide')
+     scoreText.classList.add('hide')
+     if (playerScoreList.length === 0) {
+      localStorage.setItem("playerScores", JSON.stringify(scoreList))
+      displayHighScores(scoreList)
+     }else {   
+      localStorage.setItem("playerScores", JSON.stringify(playerScoreList,...scoreList))
+      displayHighScores(JSON.parse(localStorage.getItem("playerScores")))
+    };
+  }
+}
+
+function displayHighScores(scores) {
+  scores.forEach(player => {
+    const li = document.createElement("li");
+    li.innerHTML = player.initials + " : " + player.finalScore 
+    highScoreList.appendChild(li);
+    
+  })
+}
+
 // start game function
 function startGame() {
   startButton.classList.add('hide');
@@ -37,12 +81,12 @@ function startGame() {
   currentQuestionIndex = 0;
   questionContainerElement.classList.remove('hide');
   setNextQuestion();
-}
+};
 // showing and randomizing the question order
 function setNextQuestion() {
   resetState();
   showQuestion(shuffledQuestions[currentQuestionIndex]);
-}
+};
 
 function showQuestion(question) {
   questionElement.innerText = question.question;
@@ -73,11 +117,22 @@ function selectAnswer(e) {
   Array.from(answerButtonsElement.children).forEach(button => {
     setStatusClass(button, button.dataset.correct)
   })
-  if (shuffledQuestions.length > currentQuestionIndex + 1) {
-    nextButton.classList.remove('hide')
+  if (correct) {
+    score += 5
   } else {
-    startButton.innerText = 'Restart'
-    startButton.classList.remove('hide')
+    count -= 5
+  }
+  if (shuffledQuestions.length > currentQuestionIndex + 1) {
+    nextButton.classList.remove('hide');
+  } else {
+    submitButton.classList.remove('hide');
+    clearInterval(interval);
+    questionContainerElement.classList.add('hide');
+    topScores.classList.remove('hide');
+    var totalScore = score + count;
+    console.log(score + count)
+    playerScore.innerHTML = totalScore;
+
   }
 }
 
@@ -87,10 +142,7 @@ function setStatusClass(element, correct) {
     element.classList.add('correct')
   } else {
     element.classList.add('wrong')
-    count -= 5 
-    if (count < 0) {
-        count = 0
-    }
+    
   }
 }
 
